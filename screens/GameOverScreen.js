@@ -1,17 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
+import MainButton from '../components/MainButton';
 import  Colors  from '../constants/color';
 
 const GameOverScreen = props => {
     return (
         <View style={styles.screen}>
-            <Text>The Game is Over!</Text>
+            <Text style={styles.text}>The Game is Over!</Text>
             <View style={styles.imageContainer}>
-                <Image style={styles.image} source={require('../assets/success.png')} resizeMode="contain"/>
+                <Image 
+                    style={styles.image} 
+                    source={require('../assets/success.jpeg')} 
+                    resizeMode="cover"
+                />
             </View>
-            <Text>Number of rounds: {props.roundsNumber}</Text>
-            <Text>Number was: {props.userNumber}</Text>
-            <Button title="NEW GAME" onPress={props.onRestart}/>
+            <Text>Your phone needed {props.roundsNumber} rounds to</Text>
+            <Text>guess the number {props.userNumber}</Text>
+            <View style={styles.button}>
+                <MainButton onPress={props.onRestart}>NEW GAME</MainButton>
+            </View>
         </View>
     );
 };
@@ -34,6 +41,13 @@ const styles = StyleSheet.create({
     image: {
        width: '100%',
        height: '100%'
+    },
+    button: {
+        padding: 30
+    },
+    text: {
+        fontSize: 25,
+        fontWeight: 'bold'
     }
 });
 
