@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Alert} from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, FlatList} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import NumberContainer from '../components/NumberContainer';
 import Card from '../components/Card';
 import MainButton from '../components/MainButton';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 
 const generateRandomBetween = (min, max, exclude) => {
@@ -19,8 +20,10 @@ const generateRandomBetween = (min, max, exclude) => {
 };
 
 const GameScreen = props => {
-    const [currentGuess, setCurrentGuess] = useState(generateRandomBetween(1, 100, props.userChoice));
+    const initial = generateRandomBetween(1, 100, props.userChoice);
+    const [currentGuess, setCurrentGuess] = useState(initial);
     const [rounds, setRounds] = useState(0);
+    const [pastGuesses, setPastGuesses] = useState([initial]);
 
     const currentLow = useRef(1);
     const currentHigh = useRef(100);
@@ -29,7 +32,7 @@ const GameScreen = props => {
 
     useEffect(() => {
         if(currentGuess === userChoice) {
-            onGameOver(rounds); // props.onGameOver(rounds);
+            onGameOver(pastGuesses.length); // props.onGameOver(rounds);
         }
     }, [currentGuess, userChoice, onGameOver]);
 
@@ -47,8 +50,15 @@ const GameScreen = props => {
         }
         const nextNumber = generateRandomBetween(currentLow.current, currentHigh.current, currentGuess);
         setCurrentGuess(nextNumber);
-        setRounds(curRounds => curRounds +1);
+        setPastGuesses(curPast => [nextNumber, ...curPast])
     };
+
+    const renderListItem = (listLength, itemData) => (
+        <View style={styles.listItem}>
+            <Text>#{listLength-itemData.index}</Text>
+            <Text>{itemData.item}</Text>
+        </View>
+    );
 
     return (
         <View style={styles.screen}>
@@ -62,6 +72,14 @@ const GameScreen = props => {
                 <Ionicons name="md-add" size={24} color="white"/>
                 </MainButton>
             </Card>
+            <View style={styles.listContainer}>
+                <FlatList 
+                    keyExtractor={item => item.toString()}
+                    data={pastGuesses}
+                    renderItem={renderListItem.bind(this, pastGuesses.length)}
+                    contentContainerStyle={styles.list}
+                />
+            </View>
         </View>
     );
 };
@@ -78,6 +96,25 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: 300,
         maxWidth: '80%'
+    },
+    listContainer: {
+        flexGrow: 1,
+        width: '60%',
+    },
+    list: {
+        flexGrow: 1,
+        justifyContent: 'flex-end'
+    },
+    listItem: {
+        borderColor: Colors.black,
+        borderWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderRadius: 10,
+        padding: 15, 
+        marginVertical: 10,
+        backgroundColor: Colors.white,
+        width: '100%'
     }
 });
 
